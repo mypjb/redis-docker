@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM centos
 
 MAINTAINER Redis Docker Maintainers "280417314@qq.com"
 
@@ -11,22 +11,28 @@ ENV REDIS_URL http://download.redis.io/releases/redis-3.2.8.tar.gz
 #redis path
 ENV REDIS_PATH /usr/local/redis
 
-RUN apt-get update -y
 
-RUN apt-get install -y gcc make wget net-tools git nano \
-	&& wget $REDIS_URL -o redis.tar.gz \
+RUN yum install -y wget \
+	&& wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
+	&& yum makecache
+
+RUN yum update -y
+
+RUN yum install -y gcc make net-tools git nano \
+	&& wget $REDIS_URL -O redis.tar.gz \
 	&& mkdir -p $REDIS_PATH \
-	&& tar -xzf redis.tar.gz -C $REDIS_PATH --strip-components=1 \
+	&& tar -xvf redis.tar.gz -C $REDIS_PATH --strip-components=1 \
 	&& rm -rf redis.tar.gz \
 	&& cd $REDIS_PATH \
 	&& make \
 	&& git clone $REDIS_GIT redis_git \
-	&& cp -rf redis_git/* ./ 
-	&& ln -s $REDIS_PATH/src/redis-server /usr/local/bin
+	&& cp -rf redis_git/conf/* ./ \
+	&& ln -s $REDIS_PATH/src/redis-server /usr/local/bin \
+	&& rm -rf redis_git
 
 EXPOSE 6379
 
-CMD redis-server ; /bin/bash ;
+CMD redis-server $REDIS_PATH/redis.conf ; /bin/bash ;
 	
 
 	
