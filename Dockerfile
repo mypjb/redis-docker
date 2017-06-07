@@ -29,4 +29,4 @@ RUN yum install -y gcc make net-tools git nano wget \
 	
 EXPOSE 6379
 
-CMD reis-server $REDIS_PATH/conf/redis.conf ; /bin/bash ;
+CMD redis-server $REDIS_PATH/conf/redis.conf ; /bin/bash ;
